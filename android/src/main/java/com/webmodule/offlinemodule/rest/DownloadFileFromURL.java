@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.webmodule.offlinemodule.Constants;
-import com.webmodule.offlinemodule.FullscreenActivity;
+import com.webmodule.offlinemodule.activity.FullscreenActivity;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;

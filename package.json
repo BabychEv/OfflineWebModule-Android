@@ -1,0 +1,13 @@
+{
+  "name": "OfflineWebModule-Android",
+  "version": "0.1.0",
+  "repository": "https://github.com/BabychEv/OfflineWebModule-Android",
+  "description": "Test Offline Web View",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native"
+  ]
+}
