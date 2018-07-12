@@ -1,6 +1,6 @@
 {
   "name": "OfflineWebModule-Android",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "https://github.com/BabychEv/OfflineWebModule-Android",
   "description": "Test Offline Web View",
   "main": "index.js",
