@@ -15,4 +15,5 @@ public class Constants {
     public static final String JS = "js/";
     public static final String SRC = "src=\"";
     public static final String INITIAL_URL_KEY = "initial_module_url";
+    public static final String INITIAL_PROMISE_KEY = "initial_promise_feedback";
 }

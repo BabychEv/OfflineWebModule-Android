@@ -2,9 +2,10 @@ package com.webmodule.offlinemodule.rest;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.webkit.WebView;
 
 import com.webmodule.offlinemodule.Constants;
-import com.webmodule.offlinemodule.activity.FullscreenActivity;
+import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -14,10 +15,12 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class DownloadFileFromURL extends AsyncTask<String, String, String> {
-    private FullscreenActivity activity;
+    private HtmlFileHandler htmlFileHandler;
+    private WebView webview;
 
-    public DownloadFileFromURL(FullscreenActivity activity) {
-        this.activity = activity;
+    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, WebView webview) {
+        this.htmlFileHandler = htmlFileHandler;
+        this.webview = webview;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
             int lenghtOfFile = conection.getContentLength();
             InputStream input = new BufferedInputStream(url.openStream(),
                     8192);
-            OutputStream output = new FileOutputStream(activity.getExternalFilesDir(Constants.DIRECTORY_NAME)
+            OutputStream output = new FileOutputStream(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME)
                     + Constants.FILE_NAME);
             byte data[] = new byte[1024];
             long total = 0;
@@ -59,6 +62,6 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String url) {
-        activity.loadSavedContent();
+        htmlFileHandler.loadSavedContent(webview);
     }
 }

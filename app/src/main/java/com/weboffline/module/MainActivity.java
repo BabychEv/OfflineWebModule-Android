@@ -2,33 +2,15 @@ package com.weboffline.module;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.facebook.react.ReactActivity;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
-import com.webmodule.offlinemodule.module.OfflineWebPackage;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.webmodule.offlinemodule.module.OfflineWebModule;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class MainActivity extends ReactActivity {
-
-    @Override protected String getMainComponentName() {
-        return "OfflineWebExample";
-    }
-
-    @Override protected boolean getUseDeveloperSupport() {
-        return true;
-    }
-
-    @Override protected List<ReactPackage> getPackages() {
-        return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new OfflineWebPackage()); // <-- Add this line with your package name.
-    }
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +21,7 @@ public class MainActivity extends ReactActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                new OfflineWebModule(new ReactApplicationContext(MainActivity.this)).startWebModule("", null);
             }
         });
     }

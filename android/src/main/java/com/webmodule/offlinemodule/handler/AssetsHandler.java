@@ -1,4 +1,4 @@
-package com.webmodule.offlinemodule;
+package com.webmodule.offlinemodule.handler;
 
 import android.content.Context;
 import android.content.res.AssetManager;

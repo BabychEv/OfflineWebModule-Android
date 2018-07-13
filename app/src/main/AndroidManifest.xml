@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.webmodule.offlinemodule.FullscreenActivity"
+            android:name="com.webmodule.offlinemodule.activity.FullscreenActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
