@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.webkit.WebMessage;
 import android.webkit.WebMessagePort;
 import android.webkit.WebSettings;
@@ -111,7 +110,6 @@ public class FullscreenActivity extends AppCompatActivity {
         port = channel[0];
         port.setWebMessageCallback(new WebMessagePort.WebMessageCallback(){
             @Override public void onMessage(WebMessagePort port, WebMessage message) {
-                Log.d("promise", "send result - " + message.getData());
                 Intent intent = new Intent(FeedBackReceiver.FEEDBACK_ACTION);
                 intent.putExtra(FeedBackReceiver.FEEDBACK_ACTION, message.getData());
                 sendBroadcast(intent);
