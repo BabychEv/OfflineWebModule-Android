@@ -24,7 +24,6 @@ public class OfflineWebModule extends ReactContextBaseJavaModule {
         receiver = new FeedBackReceiver(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(FeedBackReceiver.FEEDBACK_ACTION);
-        filter.addAction(FeedBackReceiver.CLOSE_ACTION);
         getReactApplicationContext().registerReceiver(receiver, filter);
     }
 
@@ -51,9 +50,5 @@ public class OfflineWebModule extends ReactContextBaseJavaModule {
         getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(WEB_CLICK_EVENT, params);
-    }
-
-    public void close() {
-        getReactApplicationContext().unregisterReceiver(receiver);
     }
 }

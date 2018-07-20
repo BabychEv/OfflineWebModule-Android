@@ -127,7 +127,6 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
-        sendBroadcast(new Intent(FeedBackReceiver.CLOSE_ACTION));
         unregisterReceiver(receiver);
         super.onDestroy();
     }
