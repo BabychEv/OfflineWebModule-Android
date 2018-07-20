@@ -2,15 +2,13 @@ package com.webmodule.offlinemodule.activity;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.webkit.WebMessage;
 import android.webkit.WebMessagePort;
 import android.webkit.WebSettings;
@@ -18,6 +16,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.admin.AdminAuthDialog;
+import com.webmodule.offlinemodule.admin.AdminMenuDialog;
 import com.webmodule.offlinemodule.broadcast.FeedBackReceiver;
 import com.webmodule.offlinemodule.broadcast.RootBroadcastReceiver;
 import com.webmodule.offlinemodule.handler.AssetsHandler;
@@ -32,7 +32,8 @@ public class FullscreenActivity extends AppCompatActivity {
     private String updateUrl;
     private HtmlFileHandler htmlFileHandler;
     private WebMessagePort port;
-    private DownloadFileFromURL htmlLoader;
+    private long lastClickTime;
+    private int superUserClicksCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,8 @@ public class FullscreenActivity extends AppCompatActivity {
         updateUrl = getIntent().getStringExtra(Constants.INITIAL_URL_KEY);
         addWebViewSettings();
         initReceiver();
-        htmlFileHandler = new HtmlFileHandler();
-        htmlLoader = new DownloadFileFromURL(htmlFileHandler, webview);
+        htmlFileHandler = new HtmlFileHandler(webview);
+        initRootMenuClickListener();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -70,6 +71,21 @@ public class FullscreenActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void initRootMenuClickListener() {
+        webview.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN){
+                long newClick = System.currentTimeMillis();
+                if ((newClick - lastClickTime) < Constants.MINIMAL_CLICK_DELAY) superUserClicksCounter ++;
+                else superUserClicksCounter = 0;
+                if (superUserClicksCounter == 4)
+                    new AdminAuthDialog().show(getSupportFragmentManager(), AdminAuthDialog.class.getSimpleName());
+                lastClickTime = newClick;
+            }
+            return false;
+        });
+    }
+
     @Override protected void onStart() {
         super.onStart();
         fillUpWebView();
@@ -77,31 +93,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void fillUpWebView() {
         if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists())
-            loadContent();
+            htmlFileHandler.loadSavedContent();
         else
             copyInitialContent();
     }
 
-    private void loadContent() {
-        if (isNetworkAvailable())
-            htmlLoader.execute(updateUrl);
-        else
-            htmlFileHandler.loadSavedContent(webview);
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = null;
-        if (cm != null) {
-            activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        } else
-            return false;
-    }
-
     private void copyInitialContent() {
         AssetsHandler.copyAssets(this, Constants.DIRECTORY_NAME);
-        htmlFileHandler.loadSavedContent(webview);
+        htmlFileHandler.loadSavedContent();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -129,5 +128,13 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override protected void onDestroy() {
         unregisterReceiver(receiver);
         super.onDestroy();
+    }
+
+    public void showAdminMenu() {
+        new AdminMenuDialog().show(getSupportFragmentManager(), AdminMenuDialog.class.getSimpleName());
+    }
+
+    public void loadNewContent(String newScreenId) {
+        new DownloadFileFromURL(htmlFileHandler, getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).execute(updateUrl);
     }
 }

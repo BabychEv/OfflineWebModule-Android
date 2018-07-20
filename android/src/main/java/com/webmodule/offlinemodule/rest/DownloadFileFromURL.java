@@ -1,10 +1,7 @@
 package com.webmodule.offlinemodule.rest;
 
 import android.os.AsyncTask;
-import android.util.Log;
-import android.webkit.WebView;
 
-import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
 import java.io.BufferedInputStream;
@@ -16,11 +13,11 @@ import java.net.URLConnection;
 
 public class DownloadFileFromURL extends AsyncTask<String, String, String> {
     private HtmlFileHandler htmlFileHandler;
-    private WebView webview;
+    private String rootPath;
 
-    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, WebView webview) {
+    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, String rootPath) {
         this.htmlFileHandler = htmlFileHandler;
-        this.webview = webview;
+        this.rootPath = rootPath;
     }
 
     @Override
@@ -34,12 +31,13 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
         try {
             URL url = new URL(f_url[0]);
             URLConnection conection = url.openConnection();
+            String basicAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTMyMDg4NjE3fQ.lHleLyfZBAC8jdMcHerzHIWbPF4jCoI1naD1t8D80Ec";
+            conection.setRequestProperty ("Authorization", basicAuth);
+            conection.setUseCaches(false);
             conection.connect();
             int lenghtOfFile = conection.getContentLength();
-            InputStream input = new BufferedInputStream(url.openStream(),
-                    8192);
-            OutputStream output = new FileOutputStream(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME)
-                    + Constants.FILE_NAME);
+            InputStream input = new BufferedInputStream(url.openStream(), 8192);
+            OutputStream output = new FileOutputStream(rootPath);
             byte data[] = new byte[1024];
             long total = 0;
             while ((count = input.read(data)) != -1) {
@@ -50,9 +48,8 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
             output.flush();
             output.close();
             input.close();
-
         } catch (Exception e) {
-            Log.e("tag", e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -62,6 +59,6 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String url) {
-        htmlFileHandler.loadSavedContent(webview);
+        htmlFileHandler.loadSavedContent();
     }
 }

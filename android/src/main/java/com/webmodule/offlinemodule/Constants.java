@@ -1,6 +1,7 @@
 package com.webmodule.offlinemodule;
 
 public class Constants {
+    public static final int MINIMAL_CLICK_DELAY = 300;
     public static final String DIRECTORY_NAME = "client";
     public static final String FILE_NAME = "/index.html";
     public static final String MIME = "text/html";
@@ -16,4 +17,5 @@ public class Constants {
     public static final String SRC = "src=\"";
     public static final String INITIAL_URL_KEY = "initial_module_url";
     public static final String INITIAL_PROMISE_KEY = "initial_promise_feedback";
+    public static final String DEV_ADMIN_PASSWORD = "123456";
 }

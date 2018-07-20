@@ -13,8 +13,14 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class HtmlFileHandler {
+    private WebView webview;
 
-    public void loadSavedContent(WebView webview) {
+    public HtmlFileHandler(WebView webview) {
+
+        this.webview = webview;
+    }
+
+    public void loadSavedContent() {
         File file = new File(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME);
         if (file.exists())
             try {
