@@ -74,9 +74,10 @@ public class FullscreenActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     private void initRootMenuClickListener() {
         webview.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN){
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 long newClick = System.currentTimeMillis();
-                if ((newClick - lastClickTime) < Constants.MINIMAL_CLICK_DELAY) superUserClicksCounter ++;
+                if ((newClick - lastClickTime) < Constants.MINIMAL_CLICK_DELAY)
+                    superUserClicksCounter++;
                 else superUserClicksCounter = 0;
                 if (superUserClicksCounter == 4)
                     new AdminAuthDialog().show(getSupportFragmentManager(), AdminAuthDialog.class.getSimpleName());
@@ -107,7 +108,7 @@ public class FullscreenActivity extends AppCompatActivity {
     private void addPort() {
         final WebMessagePort[] channel = webview.createWebMessageChannel();
         port = channel[0];
-        port.setWebMessageCallback(new WebMessagePort.WebMessageCallback(){
+        port.setWebMessageCallback(new WebMessagePort.WebMessageCallback() {
             @Override public void onMessage(WebMessagePort port, WebMessage message) {
                 Intent intent = new Intent(FeedBackReceiver.FEEDBACK_ACTION);
                 intent.putExtra(FeedBackReceiver.FEEDBACK_ACTION, message.getData());
@@ -134,7 +135,11 @@ public class FullscreenActivity extends AppCompatActivity {
         new AdminMenuDialog().show(getSupportFragmentManager(), AdminMenuDialog.class.getSimpleName());
     }
 
-    public void loadNewContent(String newScreenId) {
-        new DownloadFileFromURL(htmlFileHandler, getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).execute(updateUrl);
+    public void loadNewContent(String newScreenId, int selectedItemPosition) {
+        Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
+        intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
+        sendBroadcast(intent);
+        new DownloadFileFromURL(htmlFileHandler)
+                .load(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME, updateUrl, newScreenId);
     }
 }

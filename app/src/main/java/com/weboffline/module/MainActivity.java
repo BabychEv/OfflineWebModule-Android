@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new OfflineWebModule(new ReactApplicationContext(MainActivity.this)).startWebModule("http://cannad.igorlysenko.com/api/vendors/1/stores/1/presentation");
+                new OfflineWebModule(new ReactApplicationContext(MainActivity.this)).startWebModule("http://cannad.igorlysenko.com/api/vendors/1/stores/id/presentation");
             }
         });
     }

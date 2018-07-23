@@ -102,7 +102,7 @@ public class AdminMenuDialog extends DialogFragment {
         if (isNetworkAvailable()) {
             FullscreenActivity activity = (FullscreenActivity) getActivity();
             if (activity != null)
-                ((FullscreenActivity) getActivity()).loadNewContent(screenId.getText().toString());
+                ((FullscreenActivity) getActivity()).loadNewContent(screenId.getText().toString(), spinner.getSelectedItemPosition());
             dismiss();
         } else
             Toast.makeText(getContext(), getString(R.string.internet_connection_error), Toast.LENGTH_SHORT).show();

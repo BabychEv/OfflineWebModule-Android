@@ -16,6 +16,9 @@ public class Constants {
     public static final String JS = "js/";
     public static final String SRC = "src=\"";
     public static final String INITIAL_URL_KEY = "initial_module_url";
-    public static final String INITIAL_PROMISE_KEY = "initial_promise_feedback";
+    public static final String URL_REGEX = "/";
+    public static final String SCREEN_ID_KEY = "id";
+
+    public static final String DEV_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTMyMDg4NjE3fQ.lHleLyfZBAC8jdMcHerzHIWbPF4jCoI1naD1t8D80Ec";
     public static final String DEV_ADMIN_PASSWORD = "123456";
 }

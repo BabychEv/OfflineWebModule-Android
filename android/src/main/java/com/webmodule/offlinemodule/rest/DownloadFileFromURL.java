@@ -1,64 +1,80 @@
 package com.webmodule.offlinemodule.rest;
 
-import android.os.AsyncTask;
-
+import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
-import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
-public class DownloadFileFromURL extends AsyncTask<String, String, String> {
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
+public class DownloadFileFromURL {
     private HtmlFileHandler htmlFileHandler;
-    private String rootPath;
 
-    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, String rootPath) {
+    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler) {
         this.htmlFileHandler = htmlFileHandler;
-        this.rootPath = rootPath;
     }
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
+    public void load(String path, String updateUrl, String screenId) {
+        Observable.just(screenId)
+                .observeOn(Schedulers.io())
+                .concatMap(s -> loadNewContent(updateUrl, screenId))
+                .concatMap(responseBody -> saveNewContent(path, responseBody))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(isOk -> htmlFileHandler.loadSavedContent(),
+                        e -> {},
+                        () -> {});
     }
 
-    @Override
-    protected String doInBackground(String... f_url) {
-        int count;
-        try {
-            URL url = new URL(f_url[0]);
-            URLConnection conection = url.openConnection();
-            String basicAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTMyMDg4NjE3fQ.lHleLyfZBAC8jdMcHerzHIWbPF4jCoI1naD1t8D80Ec";
-            conection.setRequestProperty ("Authorization", basicAuth);
-            conection.setUseCaches(false);
-            conection.connect();
-            int lenghtOfFile = conection.getContentLength();
-            InputStream input = new BufferedInputStream(url.openStream(), 8192);
-            OutputStream output = new FileOutputStream(rootPath);
-            byte data[] = new byte[1024];
-            long total = 0;
-            while ((count = input.read(data)) != -1) {
-                total += count;
-                publishProgress("" + (int) ((total * 100) / lenghtOfFile));
-                output.write(data, 0, count);
+    private Observable<ResponseBody> loadNewContent(String updateUrl, String screenId) {
+        return Observable.create(subscriber -> {
+            String[] urlParts = updateUrl.split(Constants.URL_REGEX);
+            String url = updateUrl.replace(Constants.SCREEN_ID_KEY, screenId);
+            try {
+                ResponseBody body = new Retrofit.Builder()
+                        .baseUrl(urlParts[0] + Constants.URL_REGEX + Constants.URL_REGEX
+                                + urlParts[1] + Constants.URL_REGEX
+                                + urlParts[2])
+                        .client(new OkHttpClient.Builder().build())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                        .create(UploadIndexHtmlGateway.class)
+                        .getIndexContent(url, Constants.DEV_TOKEN)
+                        .execute()
+                        .body();
+                subscriber.onNext(body);
+                subscriber.onCompleted();
+            } catch (Exception e) {
+                subscriber.onError(e);
             }
-            output.flush();
-            output.close();
-            input.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        });
     }
 
-    protected void onProgressUpdate(String... progress) {
-    }
-
-    @Override
-    protected void onPostExecute(String url) {
-        htmlFileHandler.loadSavedContent();
+    private Observable<Boolean> saveNewContent(String path, ResponseBody responseBody) {
+        return Observable.create(subscriber -> {
+            int count;
+            try {
+                InputStream input = responseBody.byteStream();
+                OutputStream output = new FileOutputStream(path);
+                byte data[] = new byte[1024];
+                while ((count = input.read(data)) != -1) {
+                    output.write(data, 0, count);
+                }
+                output.flush();
+                output.close();
+                input.close();
+                subscriber.onNext(true);
+                subscriber.onCompleted();
+            } catch (Exception e) {
+                subscriber.onError(e);
+            }
+        });
     }
 }

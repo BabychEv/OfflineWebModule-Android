@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import com.webmodule.offlinemodule.Constants;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,11 +22,11 @@ public class AssetsHandler {
             if (assets.length == 0) {
                 copyFile(context, path);
             } else {
-                File dir = new File(context.getExternalFilesDir(null) + "/" + path);
+                File dir = new File(context.getExternalFilesDir(null) + Constants.URL_REGEX + path);
                 if (!dir.exists())
                     dir.mkdir();
                 for (int i = 0; i < assets.length; ++i) {
-                    copyAssets(context, path + "/" + assets[i]);
+                    copyAssets(context, path + Constants.URL_REGEX + assets[i]);
                 }
             }
         } catch (IOException ex) {
@@ -38,7 +40,7 @@ public class AssetsHandler {
         OutputStream out = null;
         try {
             in = assetManager.open(filename);
-            String newFileName = context.getExternalFilesDir(null) + "/" + filename;
+            String newFileName = context.getExternalFilesDir(null) + Constants.URL_REGEX + filename;
             out = new FileOutputStream(newFileName);
             byte[] buffer = new byte[1024];
             int read;

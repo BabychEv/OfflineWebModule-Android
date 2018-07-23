@@ -17,6 +17,8 @@ import com.webmodule.offlinemodule.broadcast.RootBroadcastReceiver;
 public class OfflineWebModule extends ReactContextBaseJavaModule {
     private static final String WEB_CLICK_KEY = "web_click_key";
     private static final String WEB_CLICK_EVENT = "web_module_click_event";
+    private static final String PRINT_MODE_KEY = "print_mode_key";
+    private static final String PRINT_MODE_EVENT = "print_mode_event";
     private final FeedBackReceiver receiver;
 
     public OfflineWebModule(ReactApplicationContext reactContext) {
@@ -24,6 +26,7 @@ public class OfflineWebModule extends ReactContextBaseJavaModule {
         receiver = new FeedBackReceiver(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(FeedBackReceiver.FEEDBACK_ACTION);
+        filter.addAction(FeedBackReceiver.PRINT_MODE_ACTION);
         getReactApplicationContext().registerReceiver(receiver, filter);
     }
 
@@ -50,5 +53,13 @@ public class OfflineWebModule extends ReactContextBaseJavaModule {
         getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(WEB_CLICK_EVENT, params);
+    }
+
+    public void sendPrintMode(String mode) {
+        WritableMap params = Arguments.createMap();
+        params.putString(PRINT_MODE_KEY, mode);
+        getReactApplicationContext()
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(PRINT_MODE_EVENT, params);
     }
 }
