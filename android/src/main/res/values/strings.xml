@@ -16,7 +16,6 @@
     <string name="select_connection_error">Please select the type of connection</string>
 
     <string-array name="connection_types">
-        <item>Printer connection type</item>
         <item>Wi-Fi direct</item>
         <item>Bluetooth direct</item>
     </string-array>

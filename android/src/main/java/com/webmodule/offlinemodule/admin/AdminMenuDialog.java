@@ -91,10 +91,7 @@ public class AdminMenuDialog extends DialogFragment {
     private void showAdminSettings(View v1) {
         if (!TextUtils.isEmpty(screenIdInput.getError()) && !TextUtils.isEmpty(screenId.getText().toString()))
             screenId.startAnimation(AnimationUtils.loadAnimation(screenId.getContext(), R.anim.shake_view_animation));
-        else if (spinner.getSelectedItemPosition() == 0) {
-            connectionError.setVisibility(View.VISIBLE);
-            spinner.startAnimation(AnimationUtils.loadAnimation(screenId.getContext(), R.anim.shake_view_animation));
-        } else
+        else
             tryLoadNewContent();
     }
 
