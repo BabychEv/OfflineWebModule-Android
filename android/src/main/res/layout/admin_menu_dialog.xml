@@ -37,15 +37,6 @@
         android:layout_height="42dip"
         android:layout_marginTop="16dip"/>
 
-    <TextView
-        android:id="@+id/spinner_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="12sp"
-        android:text="@string/select_connection_error"
-        android:visibility="gone"/>
-
     <Button
         android:id="@+id/confirm_button"
         android:layout_width="200dip"
@@ -55,5 +46,16 @@
         android:textColor="@android:color/white"
         android:layout_marginTop="20dp"
         android:background="@android:color/holo_green_light"/>
+
+    <TextView
+        android:id="@+id/update_button"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dip"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="@string/update"/>
 
 </LinearLayout>

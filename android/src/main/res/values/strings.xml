@@ -13,7 +13,7 @@
     <string name="internet_connection_error">Internet connection error.</string>
     <string name="connection_type">Connection type</string>
     <string name="connection_types">ert</string>
-    <string name="select_connection_error">Please select the type of connection</string>
+    <string name="update">Update</string>
 
     <string-array name="connection_types">
         <item>Wi-Fi direct</item>

@@ -1,6 +1,11 @@
 package com.webmodule.offlinemodule;
 
 public class Constants {
+    //preferences
+    public static final String LOCAL_SETTINGS = "com.saredpreferences.module.local_settings";
+    public static final String SCREEN_ID = "com.saredpreferences.module.screen_id";
+    public static final String PRINT_CONNECTION = "com.saredpreferences.module.print_connection";
+
     public static final int MINIMAL_CLICK_DELAY = 300;
     public static final String DIRECTORY_NAME = "client";
     public static final String FILE_NAME = "/index.html";
@@ -21,4 +26,8 @@ public class Constants {
 
     public static final String DEV_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNTMyMDg4NjE3fQ.lHleLyfZBAC8jdMcHerzHIWbPF4jCoI1naD1t8D80Ec";
     public static final String DEV_ADMIN_PASSWORD = "123456";
+    public static final String CLICK = "Click";
+    public static final String RESULT_SUCCESS = "success";
+    public static final String RESULT_SAVING_ERROR = "saving error";
+    public static final String RESULT_LOADING_ERROR = "loading error";
 }

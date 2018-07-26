@@ -1,6 +1,8 @@
 package com.webmodule.offlinemodule.admin;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,15 +15,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.R;
 import com.webmodule.offlinemodule.activity.FullscreenActivity;
+import com.webmodule.offlinemodule.broadcast.FeedBackReceiver;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -30,14 +32,13 @@ public class AdminMenuDialog extends DialogFragment {
     private TextInputLayout screenIdInput;
     private EditText screenId;
     private Spinner spinner;
-    private TextView connectionError;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.admin_menu_dialog, container);
         screenId = v.findViewById(R.id.slides_id_edit_text);
         screenIdInput = v.findViewById(R.id.slides_id_input);
         spinner = v.findViewById(R.id.printer_connection_spinner);
-        connectionError = v.findViewById(R.id.spinner_error);
+        v.findViewById(R.id.update_button).setOnClickListener(this::update);
         createSpinner();
         setUpValidators();
         v.findViewById(R.id.confirm_button).setOnClickListener(this::showAdminSettings);
@@ -45,20 +46,32 @@ public class AdminMenuDialog extends DialogFragment {
     }
 
     private void createSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getDialog().getContext(), android.R.layout.simple_spinner_item,
-                getDialog().getContext().getResources().getStringArray(R.array.connection_types));
+        String[] array = getDialog().getContext().getResources().getStringArray(R.array.connection_types);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getDialog().getContext(),
+                android.R.layout.simple_spinner_item,
+                array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setPrompt(getString(R.string.connection_type));
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                connectionError.setVisibility(View.GONE);
-            }
+        applyPreviousValues(array);
+    }
 
-            @Override public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+    private void applyPreviousValues(String[] array) {
+        try {
+            String id = getPreferences().getString(Constants.SCREEN_ID, "");
+            screenIdInput.getEditText().setText(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            String connection = getPreferences().getString(Constants.PRINT_CONNECTION, "");
+            if (connection.equalsIgnoreCase(array[1]))
+                spinner.setSelection(1);
+            else
+                spinner.setSelection(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setUpValidators() {
@@ -105,6 +118,13 @@ public class AdminMenuDialog extends DialogFragment {
             Toast.makeText(getContext(), getString(R.string.internet_connection_error), Toast.LENGTH_SHORT).show();
     }
 
+    private void update(View view) {
+        if (isNetworkAvailable())
+            getDialog().getContext().sendBroadcast(new Intent(FeedBackReceiver.UPDATE_ACTION));
+        else
+            Toast.makeText(getContext(), getString(R.string.internet_connection_error), Toast.LENGTH_SHORT).show();
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getDialog().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = null;
@@ -113,5 +133,24 @@ public class AdminMenuDialog extends DialogFragment {
             return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         } else
             return false;
+    }
+
+    @Override public void onStop() {
+        saveSelectedValues();
+        super.onStop();
+    }
+
+    private void saveSelectedValues() {
+        try {
+            getPreferences().edit().putString(Constants.SCREEN_ID, screenIdInput.getEditText().getText().toString()).apply();
+            getPreferences().edit().putString(Constants.PRINT_CONNECTION,
+                    getDialog().getContext().getResources().getStringArray(R.array.connection_types)[spinner.getSelectedItemPosition()]).apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private SharedPreferences getPreferences() {
+        return getDialog().getContext().getSharedPreferences(Constants.LOCAL_SETTINGS, Context.MODE_PRIVATE);
     }
 }

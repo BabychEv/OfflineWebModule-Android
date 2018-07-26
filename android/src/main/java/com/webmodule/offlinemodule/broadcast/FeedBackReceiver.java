@@ -11,6 +11,8 @@ public class FeedBackReceiver extends BroadcastReceiver {
     public static final String FEEDBACK_ACTION = "offlinemodule_receiver_feedback";
     public static final String PRINT_MODE_ACTION = "offlinemodule_print_mode_feedback";
     public static final String SELECTED_PRINT_MODE = "offlinemodule_print_mode";
+    public static final String UPDATE_ACTION = "offlinemodule_update_action";
+    public static final String DOWNLOAD_FROM_RESULT = "offlinemodule_download_from_url_result";
     private OfflineWebModule webModule;
 
     public FeedBackReceiver(OfflineWebModule webModule) {
@@ -23,6 +25,10 @@ public class FeedBackReceiver extends BroadcastReceiver {
                 webModule.sendFeedBack(intent.getStringExtra(FEEDBACK_ACTION));
             if (intent.getAction().equals(PRINT_MODE_ACTION))
                 webModule.sendPrintMode(getSelectedMode(context, intent.getIntExtra(SELECTED_PRINT_MODE, 1)));
+            if (intent.getAction().equals(UPDATE_ACTION))
+                webModule.sendUpdateSettings();
+            if (intent.getAction().equals(DOWNLOAD_FROM_RESULT))
+                webModule.sendDownloadFromResult(intent.getStringExtra(DOWNLOAD_FROM_RESULT));
         }
     }
 
