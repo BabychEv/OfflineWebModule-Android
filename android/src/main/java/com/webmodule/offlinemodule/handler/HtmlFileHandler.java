@@ -1,5 +1,6 @@
 package com.webmodule.offlinemodule.handler;
 
+import android.text.TextUtils;
 import android.webkit.WebView;
 
 import com.webmodule.offlinemodule.Constants;
@@ -41,6 +42,40 @@ public class HtmlFileHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+    }
+
+    public void loadSavedPresentationContent() {
+        File presentationDir = webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
+        if (presentationDir != null && presentationDir.exists() && presentationDir.isDirectory()) {
+            File[] files = presentationDir.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                final String fileName = files[i].getName();
+                if(!TextUtils.isEmpty(fileName) && fileName.equals(Constants.FILE_NAME_PRESENTATION)) {
+                    try {
+                        FileInputStream fileInputStream = new FileInputStream(fileName);
+                        byte[] buffer = new byte[fileInputStream.available()];
+                        fileInputStream.read(buffer);
+                        fileInputStream.close();
+                        final String base = Constants.FILE_PREFIX + webview.getContext().
+                                getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION).getAbsolutePath();
+                        changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
+                                .concatMap(str -> changeCSSData(str, base, Constants.CSS_PREFIX))
+                                .concatMap(str1 -> changeData(str1, base, Constants.LIB_JS_PREFIX))
+                                .concatMap(str3 -> changeJSData(str3, base, Constants.JS_PREFIX))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(fullData -> {
+                                    webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
+                                }, e -> {
+                                }, () -> {
+                                });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private Observable<String> changeCSSData(final String data, final String basePath, final String replacedPath) {

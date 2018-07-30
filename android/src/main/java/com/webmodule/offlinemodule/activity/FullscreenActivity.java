@@ -93,15 +93,20 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void fillUpWebView() {
-        if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists())
-            htmlFileHandler.loadSavedContent();
+        final File presentationDirectory = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
+        if (presentationDirectory != null && presentationDirectory.exists())
+            htmlFileHandler.loadSavedPresentationContent();
         else
-            copyInitialContent();
+            downloadContent(Constants.URL_PRESENTATION);
     }
 
     private void copyInitialContent() {
         AssetsHandler.copyAssets(this, Constants.DIRECTORY_NAME);
         htmlFileHandler.loadSavedContent();
+    }
+
+    private void downloadContent(String url) {
+
     }
 
     @TargetApi(Build.VERSION_CODES.M)

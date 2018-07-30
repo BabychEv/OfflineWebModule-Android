@@ -9,6 +9,9 @@ public class Constants {
     public static final int MINIMAL_CLICK_DELAY = 300;
     public static final String DIRECTORY_NAME = "client";
     public static final String FILE_NAME = "/index.html";
+    public static final String FILE_NAME_PRESENTATION = "/slides.html";
+    public static final String DIRECTORY_NAME_PRESENTATION = "presentation";
+    public static final String URL_PRESENTATION = "http://cannad.igorlysenko.com/api/vendors/1/presentations/1/download";
     public static final String MIME = "text/html";
     public static final String ENCODING = "UTF-8";
     public static final String FILE_PREFIX = "file://";
