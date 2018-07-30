@@ -12,7 +12,9 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class SharedPreferencesModule extends ReactContextBaseJavaModule {
     private static final String LOCAL_SETTINGS = "com.saredpreferences.module.local_settings";
-    private static final String PREFERENCES_RESULT_EVENT = "com.saredpreferences.module.EVENT";
+    private static final String PREFERENCES_SAVE_EVENT = "com.saredpreferences.module.EVENT.SAVE";
+    private static final String PREFERENCES_GET_EVENT = "com.saredpreferences.module.EVENT.GET";
+    private static final String PREFERENCES_RESET_EVENT = "com.saredpreferences.module.EVENT.RESET";
     private static final String PREFERENCES_RESULT_KEY = "shared_preferences_result";
     private static final String PREFERENCES_RESULT_ERROR = "Error";
     private static final String PREFERENCES_RESULT_OK = "Done";
@@ -29,20 +31,20 @@ public class SharedPreferencesModule extends ReactContextBaseJavaModule {
     public void savePreferences(String key, String value) {
         try {
             getPreferences().edit().putString(key, value).apply();
-            sendResult(PREFERENCES_RESULT_OK);
+            sendResult(PREFERENCES_SAVE_EVENT, PREFERENCES_RESULT_OK);
         } catch (Exception e) {
             e.printStackTrace();
-            sendResult(PREFERENCES_RESULT_ERROR);
+            sendResult(PREFERENCES_SAVE_EVENT, PREFERENCES_RESULT_ERROR);
         }
     }
 
     @ReactMethod
     public void getPreferences(String key) {
         try {
-            sendResult(getPreferences().getString(key, ""));
+            sendResult(PREFERENCES_GET_EVENT, getPreferences().getString(key, ""));
         } catch (Exception e) {
             e.printStackTrace();
-            sendResult(PREFERENCES_RESULT_ERROR);
+            sendResult(PREFERENCES_GET_EVENT, PREFERENCES_RESULT_ERROR);
         }
     }
 
@@ -50,10 +52,10 @@ public class SharedPreferencesModule extends ReactContextBaseJavaModule {
     public void resetPreferences(String key) {
         try {
             getPreferences().edit().putString(key, "").apply();
-            sendResult(PREFERENCES_RESULT_OK);
+            sendResult(PREFERENCES_RESET_EVENT, PREFERENCES_RESULT_OK);
         } catch (Exception e) {
             e.printStackTrace();
-            sendResult(PREFERENCES_RESULT_ERROR);
+            sendResult(PREFERENCES_RESET_EVENT, PREFERENCES_RESULT_ERROR);
         }
     }
 
@@ -61,11 +63,11 @@ public class SharedPreferencesModule extends ReactContextBaseJavaModule {
         return getReactApplicationContext().getSharedPreferences(LOCAL_SETTINGS, Context.MODE_PRIVATE);
     }
 
-    private void sendResult(String result) {
+    private void sendResult(String event, String result) {
         WritableMap params = Arguments.createMap();
         params.putString(PREFERENCES_RESULT_KEY, result);
         getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(PREFERENCES_RESULT_EVENT, params);
+                .emit(event, params);
     }
 }
