@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                module.startWebModule("http://cannad.igorlysenko.com/api/vendors/1/stores/id/presentation");
+                module.startWebModule("http://cannad.igorlysenko.com/api/vendors/1/stores/id/presentation", 5);
             }
         });
         FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);

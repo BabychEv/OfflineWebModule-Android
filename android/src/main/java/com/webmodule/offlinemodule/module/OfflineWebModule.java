@@ -43,9 +43,10 @@ public class OfflineWebModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startWebModule(String initialUrl) {
+    public void startWebModule(String initialUrl, int slideNumber) {
         Intent intent = new Intent(getReactApplicationContext(), FullscreenActivity.class);
         intent.putExtra(Constants.INITIAL_URL_KEY, initialUrl);
+        intent.putExtra(Constants.INITIAL_PAGE_NUMBER_KEY, slideNumber);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
     }

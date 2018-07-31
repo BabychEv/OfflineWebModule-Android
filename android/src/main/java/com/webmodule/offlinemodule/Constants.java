@@ -25,6 +25,7 @@ public class Constants {
     public static final String JS = "js/";
     public static final String SRC = "src=\"";
     public static final String INITIAL_URL_KEY = "initial_module_url";
+    public static final String INITIAL_PAGE_NUMBER_KEY = "initial_page_number";
     public static final String URL_REGEX = "/";
     public static final String SCREEN_ID_KEY = "id";
 

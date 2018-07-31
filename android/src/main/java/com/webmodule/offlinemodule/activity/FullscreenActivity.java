@@ -11,18 +11,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.webkit.WebMessage;
 import android.webkit.WebMessagePort;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.webmodule.offlinemodule.Constants;
-import com.webmodule.offlinemodule.R;
 import com.webmodule.offlinemodule.Utils;
 import com.webmodule.offlinemodule.admin.AdminAuthDialog;
 import com.webmodule.offlinemodule.admin.AdminMenuDialog;
@@ -41,7 +38,6 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
     private RootBroadcastReceiver receiver;
     private String updateUrl;
     private HtmlFileHandler htmlFileHandler;
-    private WebMessagePort port;
     private long lastClickTime;
     private int superUserClicksCounter;
 
@@ -52,14 +48,15 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
         setContentView(webview);
         dialog = Utils.getProgressDialog(this);
         updateUrl = getIntent().getStringExtra(Constants.INITIAL_URL_KEY);
-        addWebViewSettings();
+        int page = getIntent().getIntExtra(Constants.INITIAL_PAGE_NUMBER_KEY, 0);
+        addWebViewSettings(page);
         initReceiver();
         htmlFileHandler = new HtmlFileHandler(webview, this);
         initRootMenuClickListener();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void addWebViewSettings() {
+    private void addWebViewSettings(int page) {
         WebSettings webSetting = webview.getSettings();
         webSetting.setJavaScriptEnabled(true);
         webSetting.setDomStorageEnabled(true);
@@ -70,6 +67,7 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     addPort();
+                    if (page > 0) webview.loadUrl("javascript:" + "Reveal.slide(" + page + ");");
                 }
             });
         }
@@ -119,7 +117,7 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
     @TargetApi(Build.VERSION_CODES.M)
     private void addPort() {
         final WebMessagePort[] channel = webview.createWebMessageChannel();
-        port = channel[0];
+        WebMessagePort port = channel[0];
         port.setWebMessageCallback(new WebMessagePort.WebMessageCallback() {
             @Override
             public void onMessage(WebMessagePort port, WebMessage message) {
