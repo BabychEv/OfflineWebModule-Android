@@ -3,6 +3,7 @@ package com.webmodule.offlinemodule.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -10,14 +11,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.WebMessage;
 import android.webkit.WebMessagePort;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.R;
+import com.webmodule.offlinemodule.Utils;
 import com.webmodule.offlinemodule.admin.AdminAuthDialog;
 import com.webmodule.offlinemodule.admin.AdminMenuDialog;
 import com.webmodule.offlinemodule.broadcast.FeedBackReceiver;
@@ -28,7 +34,9 @@ import com.webmodule.offlinemodule.rest.DownloadFileFromURL;
 
 import java.io.File;
 
-public class FullscreenActivity extends AppCompatActivity {
+public class FullscreenActivity extends AppCompatActivity implements IControlProgressBarListener{
+
+    private Dialog dialog;
     private WebView webview;
     private RootBroadcastReceiver receiver;
     private String updateUrl;
@@ -42,10 +50,11 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         webview = new WebView(this);
         setContentView(webview);
+        dialog = Utils.getProgressDialog(this);
         updateUrl = getIntent().getStringExtra(Constants.INITIAL_URL_KEY);
         addWebViewSettings();
         initReceiver();
-        htmlFileHandler = new HtmlFileHandler(webview);
+        htmlFileHandler = new HtmlFileHandler(webview, this);
         initRootMenuClickListener();
     }
 
@@ -96,15 +105,6 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void fillUpWebView() {
-        /*final File presentationDirectory = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
-        if (presentationDirectory != null
-                && presentationDirectory.exists()
-                && presentationDirectory.isDirectory()
-                && presentationDirectory.listFiles() != null
-                && presentationDirectory.listFiles().length > 0)
-            htmlFileHandler.loadSavedPresentationContent();
-        else
-            downloadContent(Constants.URL_PRESENTATION);*/
         if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists())
             htmlFileHandler.loadSavedContent();
         else
@@ -114,12 +114,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private void copyInitialContent() {
         AssetsHandler.copyAssets(this, Constants.DIRECTORY_NAME);
         htmlFileHandler.loadSavedContent();
-    }
-
-    private void downloadContent(String url) {
-        new DownloadFileFromURL(htmlFileHandler)
-                .loadPresentation(getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + Constants.FILE_NAME_PRESENTATION_ZIP,
-                        getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "", url);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -160,6 +154,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(granted -> {
                     if (granted) {
+                        visibleProgressBar();
                         Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
                         intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
                         sendBroadcast(intent);
@@ -167,7 +162,7 @@ public class FullscreenActivity extends AppCompatActivity {
                 .load(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME, updateUrl, newScreenId);*/
                         final String url = String.format(Constants.URL_PRESENTATION, newScreenId);
                         final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "/" + newScreenId + "/";
-                        new DownloadFileFromURL(htmlFileHandler)
+                        new DownloadFileFromURL(htmlFileHandler, FullscreenActivity.this)
                                 .loadPresentation(Constants.FILE_NAME_PRESENTATION_ZIP, directoryName, url);
                     } else {
 
@@ -175,5 +170,20 @@ public class FullscreenActivity extends AppCompatActivity {
                 }, error -> {
                 });
 
+    }
+
+    @Override
+    public void visibleProgressBar() {
+        dialog.show();
+    }
+
+    @Override
+    public void hideProgressBar() {
+        dialog.hide();
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }
 }

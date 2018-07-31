@@ -6,6 +6,7 @@ import android.util.Log;
 import android.webkit.WebView;
 
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.activity.IControlProgressBarListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,9 +18,10 @@ import rx.schedulers.Schedulers;
 
 public class HtmlFileHandler {
     private WebView webview;
+    private IControlProgressBarListener uiControlListener;
 
-    public HtmlFileHandler(WebView webview) {
-
+    public HtmlFileHandler(WebView webview, IControlProgressBarListener listener) {
+        uiControlListener = listener;
         this.webview = webview;
     }
 
@@ -66,7 +68,7 @@ public class HtmlFileHandler {
                         fileInputStream.read(buffer);
                         fileInputStream.close();
                         final String base = Constants.FILE_PREFIX + pathDirectory;
-                        changePresentationData(new String(buffer), base, "iminages", Constants.IMAGE_PREFIX)
+                        changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
                                 .concatMap(str -> changeCSSData(str, base, Constants.CSS_PREFIX))
                                 .concatMap(str1 -> changeData(str1, base, Constants.LIB_JS_PREFIX))
                                 .concatMap(str3 -> changeJSData(str3, base, Constants.JS_PREFIX))
@@ -74,7 +76,10 @@ public class HtmlFileHandler {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(fullData -> {
                                     webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
+                                    uiControlListener.hideProgressBar();
                                 }, e -> {
+                                    uiControlListener.hideProgressBar();
+                                    uiControlListener.showError(e.getMessage());
                                 }, () -> {
                                 });
                     } catch (IOException e) {

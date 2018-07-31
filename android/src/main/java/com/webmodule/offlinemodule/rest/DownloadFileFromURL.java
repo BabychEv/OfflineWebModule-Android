@@ -3,6 +3,7 @@ package com.webmodule.offlinemodule.rest;
 import android.content.Context;
 
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.activity.IControlProgressBarListener;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
 import java.io.BufferedInputStream;
@@ -27,12 +28,15 @@ import rx.schedulers.Schedulers;
 
 public class DownloadFileFromURL {
     private HtmlFileHandler htmlFileHandler;
+    private IControlProgressBarListener uiControlListener;
 
-    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler) {
+    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, IControlProgressBarListener listener) {
         this.htmlFileHandler = htmlFileHandler;
+        uiControlListener = listener;
     }
 
     public void load(String path, String updateUrl, String screenId) {
+        uiControlListener.visibleProgressBar();
         Observable.just(screenId)
                 .observeOn(Schedulers.io())
                 .concatMap(s -> loadNewContent(updateUrl, screenId))
@@ -40,6 +44,8 @@ public class DownloadFileFromURL {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isOk -> htmlFileHandler.loadSavedContent(),
                         e -> {
+                            uiControlListener.hideProgressBar();
+                            uiControlListener.showError(e.getMessage());
                         },
                         () -> {
                         });
@@ -107,6 +113,7 @@ public class DownloadFileFromURL {
     }
 
     public void loadPresentation(String zipFileName, String pathToDirectoryUnZip, String url) {
+        uiControlListener.visibleProgressBar();
         Observable.just(true)
                 .observeOn(Schedulers.io())
                 .concatMap(s -> loadNewContent(url))
@@ -115,6 +122,8 @@ public class DownloadFileFromURL {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isOk -> htmlFileHandler.loadSavedPresentationContent(pathToDirectoryUnZip),
                         e -> {
+                            uiControlListener.hideProgressBar();
+                            uiControlListener.showError(e.getMessage());
                         },
                         () -> {
                         });
