@@ -52,7 +52,9 @@ public class HtmlFileHandler {
                 final String fileName = files[i].getName();
                 if(!TextUtils.isEmpty(fileName) && fileName.equals(Constants.FILE_NAME_PRESENTATION)) {
                     try {
-                        FileInputStream fileInputStream = new FileInputStream(fileName);
+                        File file = new File(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION)
+                                + "/" + fileName);
+                        FileInputStream fileInputStream = new FileInputStream(file);
                         byte[] buffer = new byte[fileInputStream.available()];
                         fileInputStream.read(buffer);
                         fileInputStream.close();

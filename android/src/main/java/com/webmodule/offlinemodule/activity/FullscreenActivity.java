@@ -87,14 +87,19 @@ public class FullscreenActivity extends AppCompatActivity {
         });
     }
 
-    @Override protected void onStart() {
+    @Override
+    protected void onStart() {
         super.onStart();
         fillUpWebView();
     }
 
     private void fillUpWebView() {
         final File presentationDirectory = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
-        if (presentationDirectory != null && presentationDirectory.exists())
+        if (presentationDirectory != null
+                && presentationDirectory.exists()
+                && presentationDirectory.isDirectory()
+                && presentationDirectory.listFiles() != null
+                && presentationDirectory.listFiles().length > 0)
             htmlFileHandler.loadSavedPresentationContent();
         else
             downloadContent(Constants.URL_PRESENTATION);
@@ -106,7 +111,9 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void downloadContent(String url) {
-
+        new DownloadFileFromURL(htmlFileHandler)
+                .loadPresentation(getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + Constants.FILE_NAME_PRESENTATION_ZIP,
+                        getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "", url);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -114,7 +121,8 @@ public class FullscreenActivity extends AppCompatActivity {
         final WebMessagePort[] channel = webview.createWebMessageChannel();
         port = channel[0];
         port.setWebMessageCallback(new WebMessagePort.WebMessageCallback() {
-            @Override public void onMessage(WebMessagePort port, WebMessage message) {
+            @Override
+            public void onMessage(WebMessagePort port, WebMessage message) {
                 Intent intent = new Intent(FeedBackReceiver.FEEDBACK_ACTION);
                 intent.putExtra(FeedBackReceiver.FEEDBACK_ACTION, message.getData());
                 sendBroadcast(intent);
@@ -131,7 +139,8 @@ public class FullscreenActivity extends AppCompatActivity {
             super.onBackPressed();
     }
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         unregisterReceiver(receiver);
         super.onDestroy();
     }
