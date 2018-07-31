@@ -1,5 +1,7 @@
 package com.webmodule.offlinemodule.rest;
 
+import android.content.Context;
+
 import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
@@ -34,7 +36,7 @@ public class DownloadFileFromURL {
         Observable.just(screenId)
                 .observeOn(Schedulers.io())
                 .concatMap(s -> loadNewContent(updateUrl, screenId))
-                .concatMap(responseBody -> saveNewContent(path, responseBody))
+                .concatMap(responseBody -> saveNewContent(path, path, responseBody))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isOk -> htmlFileHandler.loadSavedContent(),
                         e -> {
@@ -67,12 +69,17 @@ public class DownloadFileFromURL {
         });
     }
 
-    private Observable<Boolean> saveNewContent(String path, ResponseBody responseBody) {
+    private Observable<Boolean> saveNewContent(String pathToDirectory, String zipFileName, ResponseBody responseBody) {
         return Observable.create(subscriber -> {
             int count;
             try {
+                deleteFile(htmlFileHandler.getContext(), pathToDirectory);
+                File dir = new File(pathToDirectory);
+                dir.mkdirs();
                 InputStream input = responseBody.byteStream();
-                OutputStream output = new FileOutputStream(path);
+                File file = new File(pathToDirectory, zipFileName);
+                file.createNewFile();
+                OutputStream output = new FileOutputStream(file);
                 byte data[] = new byte[1024];
                 while ((count = input.read(data)) != -1) {
                     output.write(data, 0, count);
@@ -88,14 +95,25 @@ public class DownloadFileFromURL {
         });
     }
 
-    public void loadPresentation(String pathToZipFile, String pathToDirectoryUnZip, String url) {
+    private void deleteFile(Context context, String path) throws IOException {
+        File file = new File(path);
+        file.delete();
+        if (file.exists()) {
+            file.getCanonicalFile().delete();
+            if (file.exists()) {
+                context.deleteFile(file.getName());
+            }
+        }
+    }
+
+    public void loadPresentation(String zipFileName, String pathToDirectoryUnZip, String url) {
         Observable.just(true)
                 .observeOn(Schedulers.io())
                 .concatMap(s -> loadNewContent(url))
-                .concatMap(responseBody -> saveNewContent(pathToZipFile, responseBody))
-                .concatMap(responseBody -> unzip(pathToZipFile, pathToDirectoryUnZip))
+                .concatMap(responseBody -> saveNewContent(pathToDirectoryUnZip, zipFileName, responseBody))
+                .concatMap(responseBody -> unzip(zipFileName, pathToDirectoryUnZip))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isOk -> htmlFileHandler.loadSavedPresentationContent(),
+                .subscribe(isOk -> htmlFileHandler.loadSavedPresentationContent(pathToDirectoryUnZip),
                         e -> {
                         },
                         () -> {
@@ -127,10 +145,10 @@ public class DownloadFileFromURL {
         });
     }
 
-    private Observable<Boolean> unzip(final String filePathZip, final String directoryUnzip) {
+    private Observable<Boolean> unzip(final String zipFileName, final String directoryUnzip) {
         return Observable.create(subscriber -> {
             boolean isOk = true;
-            File zipFile = new File(filePathZip);
+            File zipFile = new File(directoryUnzip, zipFileName);
             ZipInputStream zis = null;
             try {
                 zis = new ZipInputStream(
@@ -163,14 +181,14 @@ public class DownloadFileFromURL {
                 isOk = false;
                 subscriber.onError(e);
             } finally {
-                if(zis != null) {
+                if (zis != null) {
                     try {
                         zis.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                if(isOk) {
+                if (isOk) {
                     subscriber.onNext(true);
                     subscriber.onCompleted();
                 }

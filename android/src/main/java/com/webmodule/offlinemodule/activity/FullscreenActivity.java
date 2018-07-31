@@ -1,5 +1,6 @@
 package com.webmodule.offlinemodule.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.tbruyelle.rxpermissions.RxPermissions;
 import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.admin.AdminAuthDialog;
 import com.webmodule.offlinemodule.admin.AdminMenuDialog;
@@ -94,7 +96,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void fillUpWebView() {
-        final File presentationDirectory = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
+        /*final File presentationDirectory = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
         if (presentationDirectory != null
                 && presentationDirectory.exists()
                 && presentationDirectory.isDirectory()
@@ -102,7 +104,11 @@ public class FullscreenActivity extends AppCompatActivity {
                 && presentationDirectory.listFiles().length > 0)
             htmlFileHandler.loadSavedPresentationContent();
         else
-            downloadContent(Constants.URL_PRESENTATION);
+            downloadContent(Constants.URL_PRESENTATION);*/
+        if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists())
+            htmlFileHandler.loadSavedContent();
+        else
+            copyInitialContent();
     }
 
     private void copyInitialContent() {
@@ -150,10 +156,24 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     public void loadNewContent(String newScreenId, int selectedItemPosition) {
-        Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
-        intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
-        sendBroadcast(intent);
-        new DownloadFileFromURL(htmlFileHandler)
-                .load(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME, updateUrl, newScreenId);
+        new RxPermissions(this)
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(granted -> {
+                    if (granted) {
+                        Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
+                        intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
+                        sendBroadcast(intent);
+                /*new DownloadFileFromURL(htmlFileHandler)
+                .load(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME, updateUrl, newScreenId);*/
+                        final String url = String.format(Constants.URL_PRESENTATION, newScreenId);
+                        final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "/" + newScreenId + "/";
+                        new DownloadFileFromURL(htmlFileHandler)
+                                .loadPresentation(Constants.FILE_NAME_PRESENTATION_ZIP, directoryName, url);
+                    } else {
+
+                    }
+                }, error -> {
+                });
+
     }
 }

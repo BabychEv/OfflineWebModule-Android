@@ -1,6 +1,8 @@
 package com.webmodule.offlinemodule.handler;
 
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 
 import com.webmodule.offlinemodule.Constants;
@@ -38,29 +40,33 @@ public class HtmlFileHandler {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(fullData -> {
                             webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
-                        }, e -> { }, ()-> { });
+                        }, e -> {
+                        }, () -> {
+                        });
             } catch (IOException e) {
                 e.printStackTrace();
             }
     }
 
-    public void loadSavedPresentationContent() {
-        File presentationDir = webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION);
-        if (presentationDir != null && presentationDir.exists() && presentationDir.isDirectory()) {
+    public Context getContext() {
+        return webview.getContext();
+    }
+
+    public void loadSavedPresentationContent(String pathDirectory) {
+        File presentationDir = new File(pathDirectory);
+        if (presentationDir.exists() && presentationDir.isDirectory()) {
             File[] files = presentationDir.listFiles();
             for (int i = 0; i < files.length; i++) {
                 final String fileName = files[i].getName();
-                if(!TextUtils.isEmpty(fileName) && fileName.equals(Constants.FILE_NAME_PRESENTATION)) {
+                if (!TextUtils.isEmpty(fileName) && fileName.equals(Constants.FILE_NAME_PRESENTATION)) {
                     try {
-                        File file = new File(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION)
-                                + "/" + fileName);
+                        File file = new File(pathDirectory + "/" + fileName);
                         FileInputStream fileInputStream = new FileInputStream(file);
                         byte[] buffer = new byte[fileInputStream.available()];
                         fileInputStream.read(buffer);
                         fileInputStream.close();
-                        final String base = Constants.FILE_PREFIX + webview.getContext().
-                                getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION).getAbsolutePath();
-                        changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
+                        final String base = Constants.FILE_PREFIX + pathDirectory;
+                        changePresentationData(new String(buffer), base, "iminages", Constants.IMAGE_PREFIX)
                                 .concatMap(str -> changeCSSData(str, base, Constants.CSS_PREFIX))
                                 .concatMap(str1 -> changeData(str1, base, Constants.LIB_JS_PREFIX))
                                 .concatMap(str3 -> changeJSData(str3, base, Constants.JS_PREFIX))
@@ -93,5 +99,10 @@ public class HtmlFileHandler {
     private Observable<String> changeData(final String data, final String basePath, final String replacedPath) {
         return Observable.just(data)
                 .map(s -> s.replace(replacedPath, basePath + "/" + replacedPath));
+    }
+
+    private Observable<String> changePresentationData(final String data, final String basePath, final String replacedPath, final String newPath) {
+        return Observable.just(data)
+                .map(s -> s.replace(replacedPath, basePath + "/" + newPath));
     }
 }
