@@ -18,7 +18,7 @@ public class SharedPreferencesPackage implements ReactPackage {
         return modules;
     }
 
-    public List<JavaScriptModule> createJSModules() {
+    @Override public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }
 

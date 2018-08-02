@@ -40,6 +40,7 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
     private HtmlFileHandler htmlFileHandler;
     private long lastClickTime;
     private int superUserClicksCounter;
+    private int page;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +49,15 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
         setContentView(webview);
         dialog = Utils.getProgressDialog(this);
         updateUrl = getIntent().getStringExtra(Constants.INITIAL_URL_KEY);
-        int page = getIntent().getIntExtra(Constants.INITIAL_PAGE_NUMBER_KEY, 0);
-        addWebViewSettings(page);
+        page = getIntent().getIntExtra(Constants.INITIAL_PAGE_NUMBER_KEY, 0);
+        addWebViewSettings();
         initReceiver();
         htmlFileHandler = new HtmlFileHandler(webview, this);
         initRootMenuClickListener();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void addWebViewSettings(int page) {
+    private void addWebViewSettings() {
         WebSettings webSetting = webview.getSettings();
         webSetting.setJavaScriptEnabled(true);
         webSetting.setDomStorageEnabled(true);
@@ -67,7 +68,10 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     addPort();
-                    if (page > 0) webview.loadUrl("javascript:" + "Reveal.slide(" + page + ");");
+                    if (page > 0) {
+                        webview.loadUrl("javascript:" + "Reveal.slide(" + page + ");");
+                        page = 0;
+                    }
                 }
             });
         }
