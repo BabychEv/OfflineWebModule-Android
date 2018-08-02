@@ -6,6 +6,7 @@ import android.util.Log;
 import android.webkit.WebView;
 
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.activity.IActivityControlListener;
 import com.webmodule.offlinemodule.activity.IControlProgressBarListener;
 
 import java.io.File;
@@ -19,10 +20,12 @@ import rx.schedulers.Schedulers;
 public class HtmlFileHandler {
     private WebView webview;
     private IControlProgressBarListener uiControlListener;
+    private IActivityControlListener controlListener;
 
-    public HtmlFileHandler(WebView webview, IControlProgressBarListener listener) {
+    public HtmlFileHandler(WebView webview, IControlProgressBarListener listener, IActivityControlListener controlListener) {
         uiControlListener = listener;
         this.webview = webview;
+        this.controlListener = controlListener;
     }
 
     public void loadSavedContent() {
@@ -81,6 +84,7 @@ public class HtmlFileHandler {
                                 .subscribe(fullData -> {
                                     webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
                                     uiControlListener.hideProgressBar();
+                                    controlListener.setSlidingPage(0);
                                 }, e -> {
                                 }, () -> {
                                 });

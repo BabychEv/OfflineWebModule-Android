@@ -3,6 +3,7 @@ package com.webmodule.offlinemodule.rest;
 import android.content.Context;
 
 import com.webmodule.offlinemodule.Constants;
+import com.webmodule.offlinemodule.activity.IActivityControlListener;
 import com.webmodule.offlinemodule.activity.IControlProgressBarListener;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 
@@ -29,10 +30,12 @@ import rx.schedulers.Schedulers;
 public class DownloadFileFromURL {
     private HtmlFileHandler htmlFileHandler;
     private IControlProgressBarListener uiControlListener;
+    private IActivityControlListener controlListener;
 
-    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, IControlProgressBarListener listener) {
+    public DownloadFileFromURL(HtmlFileHandler htmlFileHandler, IControlProgressBarListener listener, IActivityControlListener controlListener) {
         this.htmlFileHandler = htmlFileHandler;
         uiControlListener = listener;
+        this.controlListener = controlListener;
     }
 
     public void load(String path, String updateUrl, String screenId) {
@@ -120,7 +123,9 @@ public class DownloadFileFromURL {
                 .concatMap(responseBody -> saveNewContent(pathToDirectoryUnZip, zipFileName, responseBody))
                 .concatMap(responseBody -> unzip(zipFileName, pathToDirectoryUnZip))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isOk -> htmlFileHandler.loadSavedPresentationContent(pathToDirectoryUnZip),
+                .subscribe(isOk -> {
+                            htmlFileHandler.loadSavedPresentationContent(pathToDirectoryUnZip);
+                        },
                         e -> {
                             uiControlListener.hideProgressBar();
                             uiControlListener.showError(e.getMessage());

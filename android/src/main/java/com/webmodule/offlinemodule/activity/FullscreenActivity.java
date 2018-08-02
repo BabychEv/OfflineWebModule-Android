@@ -31,7 +31,7 @@ import com.webmodule.offlinemodule.rest.DownloadFileFromURL;
 
 import java.io.File;
 
-public class FullscreenActivity extends AppCompatActivity implements IControlProgressBarListener{
+public class FullscreenActivity extends AppCompatActivity implements IControlProgressBarListener, IActivityControlListener {
 
     private Dialog dialog;
     private WebView webview;
@@ -52,7 +52,7 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
         page = getIntent().getIntExtra(Constants.INITIAL_PAGE_NUMBER_KEY, 0);
         addWebViewSettings();
         initReceiver();
-        htmlFileHandler = new HtmlFileHandler(webview, this);
+        htmlFileHandler = new HtmlFileHandler(webview, this, this);
         initRootMenuClickListener();
     }
 
@@ -160,11 +160,9 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
                         Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
                         intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
                         sendBroadcast(intent);
-                /*new DownloadFileFromURL(htmlFileHandler)
-                .load(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME, updateUrl, newScreenId);*/
                         final String url = String.format(Constants.URL_PRESENTATION, newScreenId);
                         final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "/" + newScreenId + "/";
-                        new DownloadFileFromURL(htmlFileHandler, FullscreenActivity.this)
+                        new DownloadFileFromURL(htmlFileHandler, FullscreenActivity.this, FullscreenActivity.this)
                                 .loadPresentation(Constants.FILE_NAME_PRESENTATION_ZIP, directoryName, url);
                     } else {
 
@@ -187,5 +185,11 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
     @Override
     public void showError(String error) {
         Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setSlidingPage(int page) {
+        webview.loadUrl("javascript:" + "Reveal.slide(" + page + ");");
+        this.page = page;
     }
 }
