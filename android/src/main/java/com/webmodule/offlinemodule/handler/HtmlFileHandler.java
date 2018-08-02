@@ -68,18 +68,20 @@ public class HtmlFileHandler {
                         fileInputStream.read(buffer);
                         fileInputStream.close();
                         final String base = Constants.FILE_PREFIX + pathDirectory;
+                        final String assetsResourcesPath = Constants.FILE_PREFIX + webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME).getAbsolutePath();
+                        //final String assetsResourcesPath = Constants.FILE_PREFIX + pathDirectory;
                         changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
-                                .concatMap(str -> changeCSSData(str, base, Constants.CSS_PREFIX))
-                                .concatMap(str1 -> changeData(str1, base, Constants.LIB_JS_PREFIX))
-                                .concatMap(str3 -> changeJSData(str3, base, Constants.JS_PREFIX))
+                                .concatMap(str -> changeCSSData(str, assetsResourcesPath, Constants.CSS_PREFIX))
+                                .concatMap(str1 -> changeData(str1, assetsResourcesPath, Constants.LIB_JS_PREFIX))
+                                .concatMap(str3 -> changeJSData(str3, assetsResourcesPath, Constants.JS_PREFIX))
+                                .concatMap(str4 -> changeJSData2(str4, assetsResourcesPath, Constants.JS_PREFIX_2))
+                                .concatMap(str5 -> changeJSData3(str5, assetsResourcesPath, Constants.SRC_2))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(fullData -> {
                                     webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
                                     uiControlListener.hideProgressBar();
                                 }, e -> {
-                                    uiControlListener.hideProgressBar();
-                                    uiControlListener.showError(e.getMessage());
                                 }, () -> {
                                 });
                     } catch (IOException e) {
@@ -106,8 +108,13 @@ public class HtmlFileHandler {
                 .map(s -> s.replace(replacedPath, basePath + "/" + replacedPath));
     }
 
-    private Observable<String> changePresentationData(final String data, final String basePath, final String replacedPath, final String newPath) {
+    private Observable<String> changeJSData2(final String data, final String basePath, final String replacedPath) {
         return Observable.just(data)
-                .map(s -> s.replace(replacedPath, basePath + "/" + newPath));
+                .map(s -> s.replace(replacedPath, Constants.SRC_2 + basePath + "/" + Constants.JS));
+    }
+
+    private Observable<String> changeJSData3(final String data, final String basePath, final String replacedPath) {
+        return Observable.just(data)
+                .map(s -> s.replace(replacedPath, Constants.SRC_2 + basePath + "/"));
     }
 }

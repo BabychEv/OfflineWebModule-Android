@@ -22,8 +22,10 @@ public class Constants {
     public static final String CSS = "css/";
     public static final String LIB_JS_PREFIX = "lib/js/";
     public static final String JS_PREFIX = "src=\"js/";
+    public static final String JS_PREFIX_2 = "src: 'js/";
     public static final String JS = "js/";
     public static final String SRC = "src=\"";
+    public static final String SRC_2 = "src: '";
     public static final String INITIAL_URL_KEY = "initial_module_url";
     public static final String INITIAL_PAGE_NUMBER_KEY = "initial_page_number";
     public static final String URL_REGEX = "/";
