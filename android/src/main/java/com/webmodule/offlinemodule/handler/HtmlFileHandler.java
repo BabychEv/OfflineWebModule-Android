@@ -77,7 +77,7 @@ public class HtmlFileHandler {
                         .subscribe(fullData -> {
                             webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
                             uiControlListener.hideProgressBar();
-                            controlListener.setSlidingPage(0);
+                            //controlListener.setSlidingPage(0);
                         }, e -> {
                         }, () -> {
                         });
