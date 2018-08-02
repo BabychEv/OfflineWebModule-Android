@@ -45,7 +45,7 @@ public class DownloadFileFromURL {
                 .concatMap(s -> loadNewContent(updateUrl, screenId))
                 .concatMap(responseBody -> saveNewContent(path, path, responseBody))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isOk -> htmlFileHandler.loadSavedContent(),
+                .subscribe(isOk -> htmlFileHandler.loadDefaultSavedContent(),
                         e -> {
                             uiControlListener.hideProgressBar();
                             uiControlListener.showError(e.getMessage());
@@ -82,9 +82,10 @@ public class DownloadFileFromURL {
         return Observable.create(subscriber -> {
             int count;
             try {
-                deleteFile(htmlFileHandler.getContext(), pathToDirectory);
-                File dir = new File(pathToDirectory);
-                dir.mkdirs();
+                final String indexHtmlPath = htmlFileHandler.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME;
+                final String pathToImages = htmlFileHandler.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.DIRECTORY_IMAGES;
+                deleteFile(htmlFileHandler.getContext(), indexHtmlPath);
+                deleteFile(htmlFileHandler.getContext(), pathToImages);
                 InputStream input = responseBody.byteStream();
                 File file = new File(pathToDirectory, zipFileName);
                 file.createNewFile();
@@ -124,7 +125,7 @@ public class DownloadFileFromURL {
                 .concatMap(responseBody -> unzip(zipFileName, pathToDirectoryUnZip))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isOk -> {
-                            htmlFileHandler.loadSavedPresentationContent(pathToDirectoryUnZip);
+                            htmlFileHandler.loadSavedPresentationContent();
                         },
                         e -> {
                             uiControlListener.hideProgressBar();

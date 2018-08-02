@@ -107,15 +107,18 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
     }
 
     private void fillUpWebView() {
-        if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists())
-            htmlFileHandler.loadSavedContent();
-        else
+        if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME).exists()) {
+            htmlFileHandler.loadDefaultSavedContent();
+        } else if (new File(getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME_PRESENTATION).exists()) {
+            htmlFileHandler.loadSavedPresentationContent();
+        } else {
             copyInitialContent();
+        }
     }
 
     private void copyInitialContent() {
         AssetsHandler.copyAssets(this, Constants.DIRECTORY_NAME);
-        htmlFileHandler.loadSavedContent();
+        htmlFileHandler.loadDefaultSavedContent();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -161,7 +164,7 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
                         intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
                         sendBroadcast(intent);
                         final String url = String.format(Constants.URL_PRESENTATION, newScreenId);
-                        final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME_PRESENTATION) + "/" + newScreenId + "/";
+                        final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME).getAbsolutePath();
                         new DownloadFileFromURL(htmlFileHandler, FullscreenActivity.this, FullscreenActivity.this)
                                 .loadPresentation(Constants.FILE_NAME_PRESENTATION_ZIP, directoryName, url);
                     } else {

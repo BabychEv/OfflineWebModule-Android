@@ -28,7 +28,7 @@ public class HtmlFileHandler {
         this.controlListener = controlListener;
     }
 
-    public void loadSavedContent() {
+    public void loadDefaultSavedContent() {
         File file = new File(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME);
         if (file.exists())
             try {
@@ -57,42 +57,32 @@ public class HtmlFileHandler {
         return webview.getContext();
     }
 
-    public void loadSavedPresentationContent(String pathDirectory) {
-        File presentationDir = new File(pathDirectory);
-        if (presentationDir.exists() && presentationDir.isDirectory()) {
-            File[] files = presentationDir.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                final String fileName = files[i].getName();
-                if (!TextUtils.isEmpty(fileName) && fileName.equals(Constants.FILE_NAME_PRESENTATION)) {
-                    try {
-                        File file = new File(pathDirectory + "/" + fileName);
-                        FileInputStream fileInputStream = new FileInputStream(file);
-                        byte[] buffer = new byte[fileInputStream.available()];
-                        fileInputStream.read(buffer);
-                        fileInputStream.close();
-                        final String base = Constants.FILE_PREFIX + pathDirectory;
-                        final String assetsResourcesPath = Constants.FILE_PREFIX + webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME).getAbsolutePath();
-                        //final String assetsResourcesPath = Constants.FILE_PREFIX + pathDirectory;
-                        changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
-                                .concatMap(str -> changeCSSData(str, assetsResourcesPath, Constants.CSS_PREFIX))
-                                .concatMap(str1 -> changeData(str1, assetsResourcesPath, Constants.LIB_JS_PREFIX))
-                                .concatMap(str3 -> changeJSData(str3, assetsResourcesPath, Constants.JS_PREFIX))
-                                .concatMap(str4 -> changeJSData2(str4, assetsResourcesPath, Constants.JS_PREFIX_2))
-                                .concatMap(str5 -> changeJSData3(str5, assetsResourcesPath, Constants.SRC_2))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(fullData -> {
-                                    webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
-                                    uiControlListener.hideProgressBar();
-                                    controlListener.setSlidingPage(0);
-                                }, e -> {
-                                }, () -> {
-                                });
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
+    public void loadSavedPresentationContent() {
+        File presentation = new File(webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME) + Constants.FILE_NAME_PRESENTATION);
+        if (presentation.exists()) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(presentation);
+                byte[] buffer = new byte[fileInputStream.available()];
+                fileInputStream.read(buffer);
+                fileInputStream.close();
+                final String base = Constants.FILE_PREFIX + webview.getContext().getExternalFilesDir(Constants.DIRECTORY_NAME).getAbsolutePath();
+                changeData(new String(buffer), base, Constants.IMAGE_PREFIX)
+                        .concatMap(str -> changeCSSData(str, base, Constants.CSS_PREFIX))
+                        .concatMap(str1 -> changeData(str1, base, Constants.LIB_JS_PREFIX))
+                        .concatMap(str3 -> changeJSData(str3, base, Constants.JS_PREFIX))
+                        .concatMap(str4 -> changeJSData2(str4, base, Constants.JS_PREFIX_2))
+                        .concatMap(str5 -> changeJSData3(str5, base, Constants.SRC_2))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(fullData -> {
+                            webview.loadDataWithBaseURL(base, fullData, Constants.MIME, Constants.ENCODING, null);
+                            uiControlListener.hideProgressBar();
+                            controlListener.setSlidingPage(0);
+                        }, e -> {
+                        }, () -> {
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
