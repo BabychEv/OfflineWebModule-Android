@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation project(path: ':android')
     implementation project(path: ':sharedmodule')
+    implementation project(path: ':webprintmodule')
 }

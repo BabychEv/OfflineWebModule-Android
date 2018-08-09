@@ -1,1 +1,1 @@
-include ':app', ':android', ':sharedmodule'
+include ':app', ':android', ':sharedmodule', ':webprintmodule'

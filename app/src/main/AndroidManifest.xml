@@ -28,6 +28,14 @@
             android:name="com.webmodule.offlinemodule.activity.FullscreenActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name="com.webprint.module.activity.PrintActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name="com.webprint.module.activity.BluetoothActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
