@@ -236,13 +236,12 @@ public class BluetoothActivity extends FragmentActivity {
                 }
                 switch (device.getBondState()) {
                     case BluetoothDevice.BOND_BONDING:
-                        PrintSharedPreferences.saveAddress(context, device.getAddress());
                         String stateBonding = String.format(context.getString(R.string.device_bonding), mDevice.getName(), mDevice.getAddress());
                         mTextViewStatus.setText(stateBonding);
-                        hideProgressBar();
-                        sendBroadcast(new Intent(PrintBluetoothModuleReceiver.ACTION_DEVICES_PAIRED));
                         break;
                     case BluetoothDevice.BOND_BONDED:
+                        PrintSharedPreferences.saveAddress(context, device.getAddress());
+                        sendBroadcast(new Intent(PrintBluetoothModuleReceiver.ACTION_DEVICES_PAIRED));
                         String stateBonded = String.format(context.getString(R.string.device_bonded), mDevice.getName(), mDevice.getAddress());
                         mTextViewStatus.setText(stateBonded);
                         BluetoothActivity.this.unregisterReceiver(mBoundDeviceReceiver);
