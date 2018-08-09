@@ -15,7 +15,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,10 +25,7 @@ import com.webprint.module.R;
 import com.webprint.module.broadcast.PrintBluetoothModuleReceiver;
 import com.webprint.module.broadcast.RootBroadcastReceiver;
 import com.webprint.module.utils.PrintSharedPreferences;
-import com.webprint.module.utils.PrintUtils;
 import com.webprint.module.utils.Utils;
-
-import java.util.Set;
 
 public class PrintActivity extends FragmentActivity {
 

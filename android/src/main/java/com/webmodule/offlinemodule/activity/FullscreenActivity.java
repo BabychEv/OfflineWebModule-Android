@@ -18,7 +18,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.tbruyelle.rxpermissions.RxPermissions;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.webmodule.offlinemodule.Constants;
 import com.webmodule.offlinemodule.Utils;
 import com.webmodule.offlinemodule.admin.AdminAuthDialog;
@@ -28,6 +28,7 @@ import com.webmodule.offlinemodule.broadcast.RootBroadcastReceiver;
 import com.webmodule.offlinemodule.handler.AssetsHandler;
 import com.webmodule.offlinemodule.handler.HtmlFileHandler;
 import com.webmodule.offlinemodule.rest.DownloadFileFromURL;
+import com.webprint.module.activity.BluetoothActivity;
 
 import java.io.File;
 
@@ -154,15 +155,13 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
         new AdminMenuDialog().show(getSupportFragmentManager(), AdminMenuDialog.class.getSimpleName());
     }
 
-    public void loadNewContent(String newScreenId, int selectedItemPosition) {
+    @SuppressLint("CheckResult")
+    public void loadNewContent(String newScreenId) {
         new RxPermissions(this)
                 .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(granted -> {
                     if (granted) {
                         visibleProgressBar();
-                        Intent intent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
-                        intent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedItemPosition);
-                        sendBroadcast(intent);
                         final String url = String.format(Constants.URL_PRESENTATION, newScreenId);
                         final String directoryName = getExternalFilesDir(Constants.DIRECTORY_NAME).getAbsolutePath();
                         new DownloadFileFromURL(htmlFileHandler, FullscreenActivity.this, FullscreenActivity.this)
@@ -173,6 +172,19 @@ public class FullscreenActivity extends AppCompatActivity implements IControlPro
                 }, error -> {
                 });
 
+    }
+
+    public void changePrintMode(int selectedMode) {
+        Intent sendEventIntent = new Intent(FeedBackReceiver.PRINT_MODE_ACTION);
+        sendEventIntent.putExtra(FeedBackReceiver.SELECTED_PRINT_MODE, selectedMode);
+        sendBroadcast(sendEventIntent);
+
+        if (selectedMode == 1) {
+            Intent startActivityIntent = new Intent(this, BluetoothActivity.class);
+            startActivity(startActivityIntent);
+        } else {
+            //TODO: need implement call open WiFi-Direction
+        }
     }
 
     @Override

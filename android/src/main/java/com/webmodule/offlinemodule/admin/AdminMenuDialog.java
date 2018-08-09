@@ -38,10 +38,11 @@ public class AdminMenuDialog extends DialogFragment {
         screenId = v.findViewById(R.id.slides_id_edit_text);
         screenIdInput = v.findViewById(R.id.slides_id_input);
         spinner = v.findViewById(R.id.printer_connection_spinner);
-        v.findViewById(R.id.update_button).setOnClickListener(this::update);
+        v.findViewById(R.id.btn_update_data).setOnClickListener(this::update);
         createSpinner();
         setUpValidators();
-        v.findViewById(R.id.confirm_button).setOnClickListener(this::showAdminSettings);
+        v.findViewById(R.id.btn_confirm_data).setOnClickListener(this::showAdminSettings);
+        v.findViewById(R.id.btn_confirm_print_type).setOnClickListener(this::updatePrintType);
         return v;
     }
 
@@ -101,6 +102,13 @@ public class AdminMenuDialog extends DialogFragment {
         }
     }
 
+    private void updatePrintType(View view) {
+        FullscreenActivity activity = (FullscreenActivity) getActivity();
+        if (activity != null)
+            ((FullscreenActivity) getActivity()).changePrintMode(spinner.getSelectedItemPosition());
+        dismiss();
+    }
+
     private void showAdminSettings(View v1) {
         if (!TextUtils.isEmpty(screenIdInput.getError()) && !TextUtils.isEmpty(screenId.getText().toString()))
             screenId.startAnimation(AnimationUtils.loadAnimation(screenId.getContext(), R.anim.shake_view_animation));
@@ -112,7 +120,7 @@ public class AdminMenuDialog extends DialogFragment {
         if (isNetworkAvailable()) {
             FullscreenActivity activity = (FullscreenActivity) getActivity();
             if (activity != null)
-                ((FullscreenActivity) getActivity()).loadNewContent(screenId.getText().toString(), spinner.getSelectedItemPosition());
+                ((FullscreenActivity) getActivity()).loadNewContent(screenId.getText().toString());
             dismiss();
         } else
             Toast.makeText(getContext(), getString(R.string.internet_connection_error), Toast.LENGTH_SHORT).show();

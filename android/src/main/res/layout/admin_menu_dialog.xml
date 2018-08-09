@@ -31,14 +31,8 @@
             android:hint="@string/word_id" />
     </android.support.design.widget.TextInputLayout>
 
-    <Spinner
-        android:id="@+id/printer_connection_spinner"
-        android:layout_width="200dip"
-        android:layout_height="42dip"
-        android:layout_marginTop="16dip"/>
-
     <Button
-        android:id="@+id/confirm_button"
+        android:id="@+id/btn_confirm_data"
         android:layout_width="200dip"
         android:layout_height="50dip"
         android:text="@string/confirm_changes"
@@ -47,15 +41,30 @@
         android:layout_marginTop="20dp"
         android:background="@android:color/holo_green_light"/>
 
-    <TextView
-        android:id="@+id/update_button"
-        android:layout_width="wrap_content"
-        android:layout_height="30dip"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="12dip"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textColor="@android:color/holo_green_dark"
-        android:text="@string/update"/>
+    <Spinner
+        android:id="@+id/printer_connection_spinner"
+        android:layout_width="200dip"
+        android:layout_height="42dip"
+        android:layout_marginTop="16dip"/>
+
+    <Button
+        android:id="@+id/btn_confirm_print_type"
+        android:layout_width="200dip"
+        android:layout_height="50dip"
+        android:text="@string/confirm_printing"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_green_light"/>
+
+    <Button
+        android:id="@+id/btn_update_data"
+        android:layout_width="200dip"
+        android:layout_height="50dip"
+        android:text="@string/update"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_green_light"/>
 
 </LinearLayout>

@@ -8,7 +8,8 @@
     <string name="empty_new_screen_id">Field \"ID\" can not be empty.</string>
     <string name="incorrect_password">Invalid password</string>
     <string name="admin_panel">Admin dashboard</string>
-    <string name="confirm_changes">Confirm changes</string>
+    <string name="confirm_changes">Confirm changes data</string>
+    <string name="confirm_printing">Confirm print type</string>
     <string name="word_id">Id</string>
     <string name="internet_connection_error">Internet connection error.</string>
     <string name="connection_type">Connection type</string>
