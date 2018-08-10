@@ -30,6 +30,7 @@ import com.webprint.module.utils.Utils;
 public class PrintActivity extends FragmentActivity {
 
     public static final String BUNDLE_PRINT_TEXT = "com.webprint.module.activity.PrintActivity.BUNDLE_PRINT_TEXT";
+    public static final long DELAY_MILLIS_CLOSE = 2000;
 
     private TextView mTextViewStatus;
 
@@ -111,6 +112,7 @@ public class PrintActivity extends FragmentActivity {
             mTextViewStatus.setText(R.string.printing);
             hideProgressBar();
             sendBroadcast(new Intent(PrintBluetoothModuleReceiver.ACTION_SEND_PRINT_TEXT));
+            closeByTime();
         } else {
             hideProgressBar();
             Toast.makeText(PrintActivity.this, R.string.printer_not_ready, Toast.LENGTH_SHORT).show();
@@ -211,12 +213,27 @@ public class PrintActivity extends FragmentActivity {
             mPrinter.closeConnection();
             mPrinter = null;
         }
-        if(mDisconnectionDeviceReceiver != null) {
+        if (mDisconnectionDeviceReceiver != null) {
             try {
                 this.unregisterReceiver(mDisconnectionDeviceReceiver);
             } catch (IllegalArgumentException e) {
                 //ignore
             }
         }
+    }
+
+    private void closeByTime() {
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        PrintActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                PrintActivity.this.finish();
+                            }
+                        });
+                    }
+                }, DELAY_MILLIS_CLOSE);
     }
 }
