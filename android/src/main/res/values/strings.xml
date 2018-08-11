@@ -14,7 +14,7 @@
     <string name="internet_connection_error">Internet connection error.</string>
     <string name="connection_type">Connection type</string>
     <string name="connection_types">ert</string>
-    <string name="update">Update</string>
+    <string name="update">Sync products data</string>
 
     <string-array name="connection_types">
         <item>Wi-Fi direct</item>
